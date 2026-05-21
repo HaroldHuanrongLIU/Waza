@@ -2,6 +2,7 @@
 name: think
 description: "Turns rough ideas into approved, decision-complete plans with validated structure before writing code. Covers new features, architecture decisions, and value judgments about whether to build, keep, or remove something. Not for bug fixes or small edits."
 when_to_use: "出方案, 给方案, 深入分析, 怎么设计, 用什么方案, 判断一下, 有没有必要, 值不值得, what's the best approach, plan this, how should I, should we keep this"
+dispatch_intent: "New feature, architecture, how should I design this, value judgment, executable plan, handoff"
 metadata:
   version: "3.24.0"
 ---
@@ -66,6 +67,8 @@ Before proposing custom implementations, search for framework built-ins, officia
 
 Give one recommended approach with rationale. Include effort, risk, and what existing code it builds on. Mention one alternative only if the tradeoff is genuinely close (>40% chance the user would prefer it). Always include one minimal option.
 
+When the plan is about distilling lessons from one project into a reusable skill set or shared rules, split the plan into **promote** and **do not promote**. Promote only reusable workflow constraints. Explicitly reject project-specific commands, paths, release checklists, safety boundaries, and private local context unless the user asks to update that project itself.
+
 For the recommendation, identify the most fragile assumption (premise collapse) and state it explicitly: "This plan assumes X. If X does not hold, Y happens." If the assumption is load-bearing and fragile, deform the design to survive its failure.
 
 **Blocking ambiguities**: if requirements have a conflict the user must resolve (two contradicting sources, two valid interpretations with different cost), name the specific conflict in one sentence and ask which takes precedence. Do not silently pick.
@@ -122,6 +125,7 @@ When the user later says "Implement the plan", "可以干", "直接改", "整", 
 | Picked a regional or locale-specific API variant without checking | List all regional or locale differences before writing integration code |
 | Introduced a second language or runtime into a single-stack project | Never add a new language or runtime without explicit approval |
 | User said "判断一下这个报错" and got Evaluation Mode | "判断一下" + error/bug context = debugging, route to `/hunt`. Evaluation Mode is for value/existence judgments only |
+| User asked to "沉淀到 Waza" after a project review | First separate transferable Waza capability from project facts. Do not import that project's commands, paths, or release rules into Waza |
 
 ## Output
 

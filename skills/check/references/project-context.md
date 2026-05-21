@@ -33,6 +33,7 @@ Use this template to compress repository context before running Waza `/check`. T
 - Credential paths, private key filenames, passwords, tokens, or secret values.
 - Maintainer-only machine paths.
 - One-off personal preferences that do not affect project behavior.
+- One-off review reports, scorecards, or diagnostic snapshots copied as guidance instead of distilled into stable project rules.
 - Full copies of Waza `/check` sections.
 
 ## Recommended Context Shape

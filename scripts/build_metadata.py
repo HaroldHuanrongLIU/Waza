@@ -124,6 +124,32 @@ def render_marketplace(marketplace: dict) -> str:
     return json.dumps(marketplace, indent=2, ensure_ascii=False) + "\n"
 
 
+ROUTING_TABLE_START = "<!-- routing-table:start -->"
+ROUTING_TABLE_END = "<!-- routing-table:end -->"
+
+
+def render_dispatcher(template: str, skills: list[dict]) -> str:
+    rows = ["| Intent | Skill | File |", "|--------|-------|------|"]
+    for skill in sorted(skills, key=lambda s: s["name"]):
+        intent = skill.get("dispatch_intent") or ""
+        if not intent:
+            raise SystemExit(
+                f"ERROR: skill {skill['name']} missing dispatch_intent in frontmatter"
+            )
+        rows.append(f"| {intent} | {skill['name']} | `skills/{skill['name']}/SKILL.md` |")
+    table = "\n".join(rows)
+    block = f"{ROUTING_TABLE_START}\n{table}\n{ROUTING_TABLE_END}"
+    if ROUTING_TABLE_START not in template or ROUTING_TABLE_END not in template:
+        raise SystemExit(
+            "ERROR: dispatcher template is missing routing-table markers"
+        )
+    pattern = re.compile(
+        re.escape(ROUTING_TABLE_START) + r".*?" + re.escape(ROUTING_TABLE_END),
+        re.DOTALL,
+    )
+    return pattern.sub(block, template)
+
+
 # Matches both pinned (v3.24.0) and unpinned (main) install URLs so the
 # generator can rewrite either form to the current VERSION.
 README_INSTALL_URL_RE = re.compile(
@@ -186,6 +212,15 @@ def main() -> int:
         actual = script.read_text() if script.exists() else ""
         script_pairs.append((script, actual, render_script_ref(actual, version)))
 
+    dispatcher_template = root / "scripts" / "dispatcher-template.md"
+    dispatcher_target = root / "scripts" / "dispatcher.md"
+    if not dispatcher_template.exists():
+        raise SystemExit(f"ERROR: missing dispatcher template at {dispatcher_template}")
+    dispatcher_actual = (
+        dispatcher_target.read_text() if dispatcher_target.exists() else ""
+    )
+    dispatcher_rendered = render_dispatcher(dispatcher_template.read_text(), skills)
+
     if args.check:
         actual = target.read_text() if target.exists() else ""
         drift = False
@@ -216,11 +251,22 @@ def main() -> int:
                 )
                 sys.stderr.write(diff(label, rendered_script, actual))
                 drift = True
+        if dispatcher_actual != dispatcher_rendered:
+            label = dispatcher_target.relative_to(root).as_posix()
+            print(
+                f"DRIFT: {label} routing table is out of sync with "
+                f"SKILL.md dispatch_intent frontmatter.\n"
+                f"Run scripts/build_metadata.py (no flags) to regenerate.",
+                file=sys.stderr,
+            )
+            sys.stderr.write(diff(label, dispatcher_rendered, dispatcher_actual))
+            drift = True
         if drift:
             return 1
         print(f"ok: {target.relative_to(root)} matches generator")
         print(f"ok: README.md install URLs pinned to v{version}")
         print(f"ok: installer defaults pinned to v{version}")
+        print(f"ok: {dispatcher_target.relative_to(root)} matches generator")
         return 0
 
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -237,6 +283,14 @@ def main() -> int:
             print(f"wrote: {script.relative_to(root)} (default WAZA_REF=v{version})")
         else:
             print(f"ok: {script.relative_to(root)} default WAZA_REF already pinned")
+    if dispatcher_actual != dispatcher_rendered:
+        dispatcher_target.write_text(dispatcher_rendered)
+        print(
+            f"wrote: {dispatcher_target.relative_to(root)} "
+            f"({len(dispatcher_rendered)} bytes)"
+        )
+    else:
+        print(f"ok: {dispatcher_target.relative_to(root)} already matches generator")
     return 0
 
 

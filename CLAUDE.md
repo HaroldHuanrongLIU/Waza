@@ -23,5 +23,7 @@ make package                    # 构建 Claude Desktop 分发 ZIP
 - 加新 skill 不要在仓库根添加 `SKILL.md`，会阻止嵌套 skill 发现。
 - 大段实现不要塞在 Makefile heredoc 或 shell heredoc 里；放到 `tests/test_*.sh` 或可导入的 `.py` 文件，再用薄 shell wrapper 调用。
 - 一次性的 review 报告不要直接进仓库长期文档；只把稳定规则沉淀到 `AGENTS.md`、`rules/`、`skills/*/references/` 或校验脚本。
+- 从具体项目复盘 Waza 时，只抽象可迁移的工作流规则；项目命令、路径、安全边界和 release 细节留在该项目自己的公开上下文。
+- 本地未跟踪的 agent 指令只能做私有 overlay；需要未来 agent 或贡献者遵守的规则必须进入已跟踪、可分发的文档或 skill/rule 文件。
 - 发版完成后给 GitHub release 加 6 个正向反应（`+1` / `laugh` / `heart` / `hooray` / `rocket` / `eyes`），通过 `gh api` 操作。**永远不加** `-1` / `confused`。
 - README 顶部不堆长文（English Coaching 等推广段）。README 的目的是让人 30 秒读完知道 Waza 是什么，详细规则归到对应 `skills/<name>/SKILL.md` 和 `rules/*.md`。

@@ -15,6 +15,7 @@ LICENSE
 README.md
 rules/**
 scripts/check-routing-drift.sh
+scripts/check_routing_drift.py
 scripts/setup-rule.sh
 scripts/setup-statusline.sh
 scripts/statusline.sh

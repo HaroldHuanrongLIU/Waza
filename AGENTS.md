@@ -8,27 +8,33 @@ Waza is a skill collection for engineering workflows. The repository contains ei
 
 ## Repository Map
 
+- `VERSION` - single source of truth for the lock-step version. Every `SKILL.md` frontmatter, marketplace entry, README install URL, and installer `WAZA_REF` default must agree with this file.
 - `skills/RESOLVER.md` - trigger and routing table for the skill set.
 - `skills/*/SKILL.md` - individual skill entrypoints.
 - `skills/*/agents/` - specialist reviewer or inspector prompts.
 - `skills/*/references/` - supporting references loaded only when needed.
 - `skills/*/scripts/` - deterministic helper scripts.
-- `rules/` - shared writing and behavior rules used by install and validation flows.
-- `.claude-plugin/marketplace.json` - plugin marketplace metadata.
-- `.github/workflows/` - public test and release automation.
-- `scripts/package-skill.sh` - builds the Claude Desktop dispatcher ZIP.
-- `scripts/` - verification and packaging helpers.
-- `Makefile` - smoke tests and package workflow.
+- `rules/` - shared writing and behavior rules used by install and validation flows. `rules/durable-context.md` is the shared Durable Context Preflight preamble; the six skills with optional memory context link to it from their own preflight section.
+- `.claude-plugin/marketplace.json` - **generated**. Edit `VERSION` or per-skill `SKILL.md` frontmatter and run `make regenerate`; never hand-edit.
+- `packaging.allowlist` - default-deny list of paths that ship in `waza.zip`. New shippable assets must be added here explicitly; everything else is excluded.
+- `.github/workflows/` - public test and release automation. `release.yml` runs `make test` before `make package` so the tagged commit is gated by the same suite as PRs.
+- `scripts/build_metadata.py` - codegen for marketplace.json, README install URLs, and installer-script `WAZA_REF` defaults. Run via `make regenerate`; CI checks drift via `make verify-generated`.
+- `scripts/verify_skills.py` - frontmatter, reference, marketplace, resolver, link, and trigger-overlap validation. `scripts/verify-skills.sh` is a thin shell wrapper that adds a few grep checks (README install string, rule-file integrity, attribution leaks).
+- `scripts/package-skill.sh` + `scripts/packaging_filter.py` - build `dist/waza.zip` from `packaging.allowlist`.
+- `scripts/setup-rule.sh` + `scripts/setup-statusline.sh` - public install helpers; `WAZA_REF` defaults are codegen-pinned to the current release tag.
+- `Makefile` - smoke discovery and packaging entrypoints. Adding a `tests/test_<name>.sh` file is enough to create a `smoke-<name>` target automatically.
+- `tests/test_*.sh` - one smoke per surface; sources `tests/test_helpers.sh` for tmpdir / repo-copy / stub-curl factories.
 
 ## Commands
 
 ```bash
-make test
-make package
-./scripts/verify-skills.sh
+make test             # verify-docs + verify-generated + verify-routing + verify-scripts + all smokes
+make regenerate       # rewrite marketplace.json, README install URLs, installer WAZA_REF defaults
+make verify-generated # drift check used by CI; non-zero if regenerate would change anything
+make package          # build dist/waza.zip from packaging.allowlist
 ```
 
-Run `make test` before meaningful changes to skill behavior, packaging, scripts, or marketplace metadata.
+Run `make test` before meaningful changes to skill behavior, packaging, scripts, marketplace metadata, or anything generated. If you edited only frontmatter or VERSION, also run `make regenerate` and commit the resulting `.claude-plugin/marketplace.json` / `README.md` / installer changes together with your source edits.
 
 ## Skill Vs Script
 
@@ -63,11 +69,12 @@ Examples: `verify-skills.sh` is a script; `rules/english.md` and `rules/chinese.
 
 Use this path for any new skill or meaningful behavior change:
 
-1. Create or update `skills/<name>/SKILL.md`; keep the description concrete, triggerable, and include a `Not for ...` exclusion.
-2. Update `skills/RESOLVER.md` and `.claude-plugin/marketplace.json` so routing, descriptions, versions, and source paths agree.
+1. Create or update `skills/<name>/SKILL.md`; keep the description concrete, triggerable, and include a `Not for ...` exclusion. Frontmatter `metadata.version` must match the top-level `VERSION` file.
+2. Update `skills/RESOLVER.md` routing rows so the new skill or changed scope is reachable; never hand-edit `.claude-plugin/marketplace.json` (run `make regenerate` instead).
 3. Keep Waza public: extract project-specific details from public repo context at runtime instead of hardcoding private paths, credentials, or one-machine workflow.
 4. Put deterministic enforcement in `scripts/` or `rules/`; keep only adaptive judgment in the skill body.
-5. Run `./scripts/verify-skills.sh`, `make test`, and `make package` before release handoff.
+5. If the new skill ships a new top-level asset (new dir under root, new helper script the user needs), add the path to `packaging.allowlist`. Default behavior is exclusion.
+6. Run `make regenerate` after frontmatter / VERSION edits, then `make test` and `make package` before release handoff.
 
 ## Maintainability Invariants
 
@@ -77,6 +84,8 @@ Use this path for any new skill or meaningful behavior change:
 - Avoid hidden runtime dependencies. If a script needs a non-stdlib Python package, external CLI, or network resolver, declare it in CI/docs and add a smoke test that fails without it.
 - Installer scripts that fetch remote content must default to a release tag. Use `WAZA_REF=main` only as an explicit bleeding-edge override.
 - One-off review reports, scorecards, or diagnostic snapshots do not belong in durable docs. Extract the stable rule into `AGENTS.md`, `CLAUDE.md`, `rules/`, `skills/*/references/`, or a verifier script, then drop the report.
+- Project case studies are inputs, not Waza policy. Only promote the transferable workflow rule; keep project-specific commands, paths, release rituals, and safety constraints in that project's public context.
+- Local-only instruction overlays are not durable source of truth. If a rule must guide future contributors or packaged agents, put it in tracked public docs or shipped skill/rule files.
 - Local review and health checks must account for modified, staged, and untracked files. New helpers, tests, references, and packaging allowlists are part of the review surface before they are committed.
 
 ## Distribution Rules

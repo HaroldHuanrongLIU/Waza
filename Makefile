@@ -39,6 +39,7 @@ verify-scripts:
 	  scripts/verify_skills.py \
 	  scripts/build_metadata.py \
 	  scripts/packaging_filter.py \
+	  scripts/check_routing_drift.py \
 	  skills/read/scripts/fetch_feishu.py \
 	  skills/read/scripts/fetch_weixin.py \
 	  skills/health/scripts/check_doc_refs.py \

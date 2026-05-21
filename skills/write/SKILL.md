@@ -2,6 +2,7 @@
 name: write
 description: "Strips AI writing patterns and rewrites prose to sound natural in Chinese or English, including artifact-grounded release, launch, and social copy. Not for code comments, commit messages, or inline docs."
 when_to_use: "帮我写, 改稿, 润色, 去AI味, 写一段, 审稿, 文档review, check this document, 推特, twitter, X推文, tweet, social post, 连贯性, 段落连贯, draft, edit text, proofread, sound natural, polish, rewrite"
+dispatch_intent: "Writing, editing prose, polish, release notes, launch/social copy, remove AI tone"
 metadata:
   version: "3.24.0"
 ---
@@ -60,7 +61,7 @@ Generate from commit messages:
 - **Fixes & Improvements**
 - **Deprecations**
 
-Format: tw93/Mole style (numbered list, bold label, one sentence on user effect, bilingual).
+Format: target-project style by default. If no project style is available, use numbered items with bold labels, one sentence on user effect, and bilingual output only when the project already uses bilingual release notes.
 
 ### Release Notes Pre-flight
 
@@ -81,6 +82,7 @@ Review checklist:
 - **Tone consistency**: Flag voice shifts, register mismatches, formulaic phrasing. Check for AI patterns using the loaded `write-zh.md` or `write-en.md` rules.
 - **Bilingual validation**: For CN/EN pairs, confirm translation accuracy and terminology consistency. Apply Bilingual Review Mode rules.
 - **Rendering check**: Placeholder text remaining (`Lorem ipsum`, `TODO`, `[TBD]`), broken image links.
+- **Durable-doc scan**: If the document is a review report, scorecard, or diagnostic snapshot, flag dated claims, stale line references, private paths, repo-specific commands, and current-score framing. Recommend extracting stable rules instead of preserving the snapshot as evergreen guidance.
 
 Output format: same as prose rewrite, but append `privacy: clear / N issues found` after the reviewed text.
 
@@ -100,7 +102,7 @@ Output: a numbered list of issues, each with the paragraph location and a one-li
 
 Activate when: "推特", "twitter", "X推文", "tweet", "social post", "折叠长度", "长文推特", "发文"
 
-Apply the five announcement rules for Tang's projects (Pake, MiaoYan, Mole, Kaku, Waza):
+Apply the five announcement rules for product-engineer projects when the project context or prior artifact shows this style:
 1. **Lead with community**: open with the social anchor (star count, user thanks, whose feedback drove the fix). Changes follow, not lead.
 2. **Highlights over completeness**: pick 2 to 4 of the most interesting changes. Dropping whole items is fine.
 3. **UX framing**: phrase each point as "你用它的时候..." or "有一种...的感觉", not "这个工具做了...".
@@ -109,7 +111,7 @@ Apply the five announcement rules for Tang's projects (Pake, MiaoYan, Mole, Kaku
 
 Close casually with an invitation, not a CTA. End with one short sentence inviting readers to try, not "立即升级".
 
-For non-Tang projects or English posts, apply the same structure (community lead, highlights, UX framing, one stance, casual close) adapted to the project's voice.
+For other engineering projects or English posts, apply the same structure (community lead, highlights, UX framing, one stance, casual close) adapted to the project's voice.
 
 ## Gotchas
 
@@ -122,6 +124,7 @@ For non-Tang projects or English posts, apply the same structure (community lead
 | Polished the user's voice into generic launch copy | Preserve the author's cadence and stance. Use real product artifacts to sharpen facts, not to replace the voice. |
 | Drafted release or social copy from memory | Read the current release page, changelog, issue/PR, product page, screenshot, or supplied source before making factual claims. |
 | Wrote launch copy in one pass without checking the live screenshots | Iterate: draft, compare against the real product screenshot or page, tighten wording to match what ships, repeat until copy and artifact agree |
+| Polished a review report until it sounded timeless | Keep snapshots labeled as snapshots, or distill them into stable rules. Do not make dated claims sound evergreen |
 
 ## Output
 

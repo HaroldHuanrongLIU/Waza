@@ -64,4 +64,16 @@ grep -q 'default WAZA_REF is not pinned' "$tmpdir/scripts.err"
 grep -q 'WAZA_REF="${WAZA_REF:-v'"$version"'}"' "$tmpdir/scripts/scripts/setup-rule.sh"
 grep -q 'WAZA_REF="${WAZA_REF:-v'"$version"'}"' "$tmpdir/scripts/scripts/setup-statusline.sh"
 
+# Dispatcher routing table is also generated; tampering the committed copy
+# (or deleting it) must trip drift detection.
+copy_repo "$tmpdir/dispatcher"
+sed -i.bak 's| think | tampered |g' "$tmpdir/dispatcher/scripts/dispatcher.md"
+rm "$tmpdir/dispatcher/scripts/dispatcher.md.bak"
+if (cd "$tmpdir/dispatcher" && python3 scripts/build_metadata.py --check >"$tmpdir/dispatcher.out" 2>"$tmpdir/dispatcher.err"); then
+  echo "build_metadata --check should detect tampered dispatcher.md"; exit 1
+fi
+grep -q 'routing table is out of sync' "$tmpdir/dispatcher.err"
+(cd "$tmpdir/dispatcher" && python3 scripts/build_metadata.py >"$tmpdir/dispatcher-regen.out")
+grep -q '| think | `skills/think/SKILL.md` |' "$tmpdir/dispatcher/scripts/dispatcher.md"
+
 echo "codegen smoke: ok"

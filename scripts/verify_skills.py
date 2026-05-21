@@ -78,12 +78,13 @@ def parse_frontmatter(path: Path) -> dict:
             if raw_value.strip():
                 fail(f"INVALID FRONTMATTER METADATA: {path} metadata must be a mapping")
             in_metadata = True
-        elif key in {"name", "description", "when_to_use"}:
+        elif key in {"name", "description", "when_to_use", "dispatch_intent"}:
             fields[key] = parse_scalar(key, raw_value)
 
     name = fields.get("name")
     description = fields.get("description")
     when_to_use = fields.get("when_to_use", "")
+    dispatch_intent = fields.get("dispatch_intent", "")
     version = fields.get("version")
 
     if not name or not name.strip():
@@ -97,6 +98,7 @@ def parse_frontmatter(path: Path) -> dict:
         "name": name.strip(),
         "description": description.strip(),
         "when_to_use": when_to_use.strip(),
+        "dispatch_intent": dispatch_intent.strip(),
         "version": version.strip(),
     }
 
@@ -155,6 +157,12 @@ def check_skill_files(root: Path, expected_version: str):
                 f"VERSION DRIFT: {path} version={fields['version']!r} "
                 f"!= VERSION file {expected_version!r}.\n"
                 f"  All skills march in lock-step. Update SKILL.md to match VERSION."
+            )
+        if not fields["dispatch_intent"]:
+            fail(
+                f"MISSING dispatch_intent: in {path}\n"
+                f"  Every skill needs a dispatch_intent line. It feeds the dispatcher "
+                f"routing table emitted by scripts/build_metadata.py."
             )
         skill_versions[skill_dir] = fields["version"]
         skill_descriptions[skill_dir] = fields["description"]
