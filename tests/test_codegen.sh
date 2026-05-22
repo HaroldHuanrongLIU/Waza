@@ -32,6 +32,8 @@ copy_repo "$tmpdir/regen"
 printf '%s\n' '{"plugins": []}' > "$tmpdir/regen/.claude-plugin/marketplace.json"
 (cd "$tmpdir/regen" && python3 scripts/build_metadata.py >"$tmpdir/regen.out")
 test "$(jq '.plugins | length' "$tmpdir/regen/.claude-plugin/marketplace.json")" -eq 9
+test "$(jq -r '.name' "$tmpdir/regen/package.json")" = "@tw93/waza"
+test "$(jq -r '.pi.skills[0]' "$tmpdir/regen/package.json")" = "./skills"
 
 # README install URLs must be pinned to VERSION, not floating on main.
 copy_repo "$tmpdir/readme"
@@ -47,6 +49,26 @@ grep -q "tw93/Waza/v${version}/scripts/" "$tmpdir/readme/README.md"
 if grep -q "tw93/Waza/main/scripts/" "$tmpdir/readme/README.md"; then
   echo "README still has unpinned install URLs after regen"; exit 1
 fi
+
+# package.json is generated too; package version and Pi metadata must stay
+# lock-step with VERSION.
+copy_repo "$tmpdir/package"
+version=$(cat "$tmpdir/package/VERSION")
+python3 -c "
+import json
+p = '$tmpdir/package/package.json'
+d = json.load(open(p))
+d['version'] = '0.0.0'
+d['pi'] = {'skills': ['./wrong']}
+open(p,'w').write(json.dumps(d, indent=2) + '\n')
+"
+if (cd "$tmpdir/package" && python3 scripts/build_metadata.py --check >"$tmpdir/package.out" 2>"$tmpdir/package.err"); then
+  echo "build_metadata --check should detect stale package.json metadata"; exit 1
+fi
+grep -q 'package.json is out of sync' "$tmpdir/package.err"
+(cd "$tmpdir/package" && python3 scripts/build_metadata.py >"$tmpdir/package-regen.out")
+test "$(jq -r '.version' "$tmpdir/package/package.json")" = "$version"
+test "$(jq -r '.pi.skills[0]' "$tmpdir/package/package.json")" = "./skills"
 
 # Installer scripts must also default to the current release tag; overriding
 # WAZA_REF=main remains available for bleeding-edge installs.

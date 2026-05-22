@@ -1,0 +1,32 @@
+{
+  "name": "@tw93/waza",
+  "version": "3.24.0",
+  "description": "Waza engineering skills for Claude Code, Codex, Pi, and compatible coding agents.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tw93/Waza.git"
+  },
+  "homepage": "https://github.com/tw93/Waza#readme",
+  "keywords": [
+    "pi-package",
+    "agent-skills",
+    "waza",
+    "claude-code",
+    "codex"
+  ],
+  "files": [
+    "LICENSE",
+    "README.md",
+    "rules",
+    "scripts",
+    "skills",
+    "!**/__pycache__/**",
+    "!**/*.pyc"
+  ],
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  }
+}

@@ -194,10 +194,10 @@ def check_references(root: Path, skill_files: list[Path]):
 
 
 def check_description_conformance(skill_descriptions: dict[str, str]):
-    """Every skill needs a triggerable opening, a 'Not for' exclusion, and a sane length.
+    """Every skill needs a triggerable opening, a 'Use when' cue, a 'Not for' exclusion, and a sane length.
 
     Locks the convention so new skills can't drift into vague descriptions that
-    the Claude Code resolver can't match.
+    agent resolvers can't match before they read when_to_use.
     """
     for skill, description in sorted(skill_descriptions.items()):
         clean = description.strip().strip('"')
@@ -211,6 +211,12 @@ def check_description_conformance(skill_descriptions: dict[str, str]):
             fail(
                 f"DESCRIPTION STARTS WITH ARTICLE: {skill}\n"
                 f"  Start with a verb or action phrase (third-person). Got: {clean[:60]!r}"
+            )
+        if "use when" not in clean.lower():
+            fail(
+                f"DESCRIPTION MISSING USE-WHEN CUE: {skill}\n"
+                f"  Description must include a 'Use when ...' trigger phrase because "
+                f"some agent runtimes see description before when_to_use. Got: {clean[:120]!r}"
             )
         if "not for" not in clean.lower():
             fail(

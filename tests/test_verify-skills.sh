@@ -98,4 +98,18 @@ if (cd "$tmpdir/repo7" && python3 scripts/verify_skills.py --root . >"$tmpdir/bu
 fi
 grep -q 'VERSION DRIFT: waza bundle' "$tmpdir/bundle.err"
 
+# Case 8: descriptions must carry a trigger cue, not just capability prose.
+copy_repo "$tmpdir/repo8"
+python3 -c "
+from pathlib import Path
+p = Path('$tmpdir/repo8/skills/read/SKILL.md')
+t = p.read_text()
+t = t.replace(' Use when users ask 看这个链接/读一下/抓取网页/read this/check this URL/fetch this page.', '')
+p.write_text(t)
+"
+if (cd "$tmpdir/repo8" && python3 scripts/verify_skills.py --root . >"$tmpdir/usewhen.out" 2>"$tmpdir/usewhen.err"); then
+  echo "verify-skills should reject descriptions without Use when trigger cues"; exit 1
+fi
+grep -q 'DESCRIPTION MISSING USE-WHEN CUE: read' "$tmpdir/usewhen.err"
+
 echo "verify-skills smoke: ok"

@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "waza",
-      "description": "Installs the full Waza toolkit. Registers all eight skills under the waza namespace, callable as /waza:think, /waza:check, /waza:hunt, /waza:design, /waza:read, /waza:write, /waza:learn, and /waza:health. For one skill, use npx skills add tw93/Waza --skill <name> while Claude Code per-skill marketplace installs are affected upstream.",
+      "description": "Installs the full Waza toolkit. Registers all eight skills under the waza namespace, callable as /waza:think, /waza:check, /waza:hunt, /waza:design, /waza:read, /waza:write, /waza:learn, and /waza:health. For one skill on Claude Code v2.1.143 or newer, use /plugin install waza-<name>@waza.",
       "version": "3.24.0",
       "category": "development",
       "source": "./",
@@ -17,7 +17,7 @@
     },
     {
       "name": "waza-check",
-      "description": "Reviews code diffs and release-ready changes after implementation, runs on-demand project-wide code-quality audits with a 4-axis scorecard, executes approved implementation plans, extracts project-specific constraints from repository context, auto-fixes safe issues, and drives approved release, publish, push, release-reaction, and issue/PR follow-through. Also triages issues and PRs when the user mentions them. Not for exploring ideas, debugging, or document prose review.",
+      "description": "Reviews code diffs, PRs, issue queues, release readiness, commits, pushes, publishing, and project audits. Use when users ask review/看看代码/合并前/看看issue/PR/release/push or to implement an approved plan, with safety gates for dirty and untracked worktrees. Not for exploring ideas, debugging root causes, or prose review.",
       "version": "3.24.0",
       "category": "development",
       "source": "./skills/check",
@@ -29,7 +29,7 @@
     },
     {
       "name": "waza-design",
-      "description": "Produces distinctive, production-grade UI for components, pages, and visual interfaces, with artifact-grounded screenshot iteration for real app polish. Not for backend logic or data pipelines.",
+      "description": "Produces distinctive, production-grade UI for pages, components, visual interfaces, typography, and screenshot-driven polish. Use when users ask 设计/做页面/做组件/UI/前端/截图 or say a screen is ugly, unclear, inconsistent, or visually wrong. Not for backend logic or data pipelines.",
       "version": "3.24.0",
       "category": "development",
       "source": "./skills/design",
@@ -41,7 +41,7 @@
     },
     {
       "name": "waza-health",
-      "description": "Runs a budget-aware Agent Health audit for Codex, Claude Code, agent instructions, verifier surfaces, and AI maintainability when agents ignore instructions, hooks/MCP fail, validation is missing, or AI-written code is hard to maintain. Flags issues by severity. Not for debugging code or reviewing PRs.",
+      "description": "Runs a budget-aware Agent Health audit for Codex, Claude Code, agent instructions, hooks/MCP, verifier surfaces, and AI maintainability. Use when users ask 检查claude/检查codex/配置检查/健康度 or report agents ignoring instructions, missing validation, or code becoming hard to maintain. Not for debugging code or reviewing PRs.",
       "version": "3.24.0",
       "category": "development",
       "source": "./skills/health",
@@ -53,7 +53,7 @@
     },
     {
       "name": "waza-hunt",
-      "description": "Finds root cause of errors, crashes, regressions, screenshot-reported defects, unexpected behavior, and failing tests before applying any fix. Not for code review or new features.",
+      "description": "Finds root cause before applying fixes for errors, crashes, regressions, failing tests, broken behavior, and screenshot-reported defects. Use when users ask 排查/报错/崩溃/不工作/回归/判断为什么报错, or say something used to work and now fails. Not for code review or new features.",
       "version": "3.24.0",
       "category": "development",
       "source": "./skills/hunt",
@@ -65,7 +65,7 @@
     },
     {
       "name": "waza-learn",
-      "description": "Runs a six-phase research workflow to turn unfamiliar domains or collected sources into publish-ready output. Not for quick lookups or single-file reads.",
+      "description": "Runs a six-phase research workflow that turns unfamiliar domains, source bundles, or collected material into publish-ready output. Use when users ask 学习一下/深入研究/研究一下/整理成文章/deep dive/compile sources or need one coherent reference from many inputs. Not for quick lookups or single-file reads.",
       "version": "3.24.0",
       "category": "development",
       "source": "./skills/learn",
@@ -77,7 +77,7 @@
     },
     {
       "name": "waza-read",
-      "description": "Fetches any URL or PDF as clean Markdown for reading, quoting, citation, or downstream work. Handles paywalls, JS-heavy pages, X/Twitter, and Chinese platforms via proxy cascade. Not for local text files already in the repo.",
+      "description": "Fetches URLs and PDFs as clean Markdown for reading, quoting, citation, and downstream work, including paywalls, JS-heavy pages, X/Twitter, and Chinese platforms. Use when users ask 看这个链接/读一下/抓取网页/read this/check this URL/fetch this page. Not for local text files already in the repo.",
       "version": "3.24.0",
       "category": "development",
       "source": "./skills/read",
@@ -89,7 +89,7 @@
     },
     {
       "name": "waza-think",
-      "description": "Turns rough ideas into approved, decision-complete plans with validated structure before writing code. Covers new features, architecture decisions, and value judgments about whether to build, keep, or remove something. Not for bug fixes or small edits.",
+      "description": "Turns rough ideas into approved, decision-complete plans with validated structure before coding. Use when users ask 出方案/给方案/深入分析/怎么设计/有没有必要/值不值得/plan this/how should I/should we keep this for features, architecture, or value judgments. Not for bug fixes or small edits.",
       "version": "3.24.0",
       "category": "development",
       "source": "./skills/think",
@@ -101,7 +101,7 @@
     },
     {
       "name": "waza-write",
-      "description": "Strips AI writing patterns and rewrites prose to sound natural in Chinese or English, including artifact-grounded release, launch, and social copy. Not for code comments, commit messages, or inline docs.",
+      "description": "Rewrites and polishes prose in Chinese or English, removing AI-like wording while preserving intent for drafts, docs, release notes, launch copy, and social posts. Use when users ask 帮我写/改稿/润色/去AI味/写一段/审稿/tweet/rewrite/proofread. Not for code comments, commit messages, or inline docs.",
       "version": "3.24.0",
       "category": "development",
       "source": "./skills/write",

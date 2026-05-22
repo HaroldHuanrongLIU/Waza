@@ -37,7 +37,8 @@ def test_pipe_count_escaped_pipe_ignored():
 def test_description_happy_path(capsys):
     descs = {
         "think": (
-            "Turns rough ideas into approved plans. Not for bug fixes or small edits."
+            "Turns rough ideas into approved plans. Use when users ask for planning. "
+            "Not for bug fixes or small edits."
         ),
     }
     check_description_conformance(descs)
@@ -61,9 +62,17 @@ def test_description_too_long_rejected(capsys):
 def test_description_missing_not_for_clause(capsys):
     with pytest.raises(SystemExit):
         check_description_conformance(
-            {"x": "Does many things. Many different things. Multiple things. Useful."}
+            {"x": "Does many things. Use when users ask for useful things."}
         )
     assert "MISSING EXCLUSION CLAUSE" in capsys.readouterr().err
+
+
+def test_description_missing_use_when_rejected(capsys):
+    with pytest.raises(SystemExit):
+        check_description_conformance(
+            {"x": "Does many things. Many different things. Not for everything else."}
+        )
+    assert "MISSING USE-WHEN CUE" in capsys.readouterr().err
 
 
 def test_description_starting_with_article_rejected(capsys):

@@ -62,18 +62,22 @@ npx skills add tw93/Waza -a codex -g -y
 
 Install just one with `npx skills add tw93/Waza --skill think -a codex -g -y`. Codex sessions can invoke installed skills by name or link to the installed `SKILL.md` path shown by `npx skills path tw93/Waza`.
 
-**Claude Code plugin marketplace**
+**Claude Code plugin marketplace** (single-skill entries require Claude Code v2.1.143+)
 
 ```bash
 /plugin marketplace add tw93/Waza
 /plugin install waza@waza
 ```
 
-Use the bundle for now. Per-skill marketplace entries like `waza-think@waza` are temporarily affected by a Claude Code v2.1.136+ path-validation regression; until upstream fixes it, install one skill with the `npx skills add ... --skill` path above.
+This installs all eight skills. Install just one with `/plugin install waza-<name>@waza` (for example, `waza-think@waza`) on Claude Code v2.1.143 or newer.
 
 **Claude Desktop**
 
 Download [waza.zip](https://github.com/tw93/Waza/releases/latest/download/waza.zip), open Customize > Skills > "+" > Create skill, and upload the ZIP.
+
+**Pi coding agent**
+
+Pi can load Waza's standard `skills/<name>/SKILL.md` layout from the repo or from package metadata that points `pi.skills` at `./skills`. The skills are usable today; `/health` still focuses on Codex and Claude Code runtime audits, so Pi-specific runtime audit coverage is pending.
 
 **Update**
 

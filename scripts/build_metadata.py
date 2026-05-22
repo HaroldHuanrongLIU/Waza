@@ -8,6 +8,7 @@ Source of truth:
 Generated files:
   - .claude-plugin/marketplace.json    full plugin manifest
   - README.md                          install URLs pinned to VERSION
+  - package.json                       npm/Pi package metadata pinned to VERSION
   - scripts/setup-rule.sh              default WAZA_REF pinned to VERSION
   - scripts/setup-statusline.sh        default WAZA_REF pinned to VERSION
 
@@ -54,8 +55,8 @@ BUNDLE_DESCRIPTION = (
     "Installs the full Waza toolkit. Registers all eight skills under the "
     "waza namespace, callable as /waza:think, /waza:check, /waza:hunt, "
     "/waza:design, /waza:read, /waza:write, /waza:learn, and /waza:health. "
-    "For one skill, use npx skills add tw93/Waza --skill <name> while Claude "
-    "Code per-skill marketplace installs are affected upstream."
+    "For one skill on Claude Code v2.1.143 or newer, use /plugin install "
+    "waza-<name>@waza."
 )
 
 CATEGORY = "development"
@@ -121,6 +122,45 @@ def build_marketplace(version: str, skills: list[dict]) -> dict:
 
 def render_marketplace(marketplace: dict) -> str:
     return json.dumps(marketplace, indent=2, ensure_ascii=False) + "\n"
+
+
+def build_package_json(version: str) -> str:
+    package = {
+        "name": "@tw93/waza",
+        "version": version,
+        "description": (
+            "Waza engineering skills for Claude Code, Codex, Pi, and "
+            "compatible coding agents."
+        ),
+        "license": "MIT",
+        "repository": {
+            "type": "git",
+            "url": "git+https://github.com/tw93/Waza.git",
+        },
+        "homepage": "https://github.com/tw93/Waza#readme",
+        "keywords": [
+            "pi-package",
+            "agent-skills",
+            "waza",
+            "claude-code",
+            "codex",
+        ],
+        "files": [
+            "LICENSE",
+            "README.md",
+            "rules",
+            "scripts",
+            "skills",
+            "!**/__pycache__/**",
+            "!**/*.pyc",
+        ],
+        "pi": {
+            "skills": [
+                "./skills",
+            ],
+        },
+    }
+    return json.dumps(package, indent=2, ensure_ascii=False) + "\n"
 
 
 ROUTING_TABLE_START = "<!-- routing-table:start -->"
@@ -197,8 +237,11 @@ def main() -> int:
     skills = collect_skill_metadata(root)
     marketplace = build_marketplace(version, skills)
     rendered = render_marketplace(marketplace)
+    package_rendered = build_package_json(version)
 
     target = root / ".claude-plugin" / "marketplace.json"
+    package_json = root / "package.json"
+    package_actual = package_json.read_text() if package_json.exists() else ""
     readme = root / "README.md"
     readme_actual = readme.read_text() if readme.exists() else ""
     readme_rendered = render_readme(readme_actual, version)
@@ -240,6 +283,15 @@ def main() -> int:
             )
             sys.stderr.write(diff("README.md", readme_rendered, readme_actual))
             drift = True
+        if package_actual != package_rendered:
+            print(
+                f"DRIFT: package.json is out of sync with VERSION v{version} "
+                f"and Pi package metadata.\n"
+                f"Run scripts/build_metadata.py (no flags) to regenerate.",
+                file=sys.stderr,
+            )
+            sys.stderr.write(diff("package.json", package_rendered, package_actual))
+            drift = True
         for script, actual, rendered_script in script_pairs:
             if actual != rendered_script:
                 label = script.relative_to(root).as_posix()
@@ -264,6 +316,7 @@ def main() -> int:
             return 1
         print(f"ok: {target.relative_to(root)} matches generator")
         print(f"ok: README.md install URLs pinned to v{version}")
+        print(f"ok: package.json pinned to v{version}")
         print(f"ok: installer defaults pinned to v{version}")
         print(f"ok: {dispatcher_target.relative_to(root)} matches generator")
         return 0
@@ -271,6 +324,11 @@ def main() -> int:
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(rendered)
     print(f"wrote: {target.relative_to(root)} ({len(rendered)} bytes)")
+    if package_actual != package_rendered:
+        package_json.write_text(package_rendered)
+        print(f"wrote: package.json (pinned version to v{version})")
+    else:
+        print(f"ok: package.json already pinned to v{version}")
     if readme_actual != readme_rendered:
         readme.write_text(readme_rendered)
         print(f"wrote: README.md (pinned install URLs to v{version})")

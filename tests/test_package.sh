@@ -28,6 +28,7 @@ for forbidden in \
   .gitignore \
   Makefile \
   VERSION \
+  package.json \
   packaging.allowlist \
   scripts/verify_skills.py \
   scripts/verify-skills.sh \
