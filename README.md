@@ -77,6 +77,10 @@ Download [waza.zip](https://github.com/tw93/Waza/releases/latest/download/waza.z
 
 **Pi coding agent**
 
+```bash
+pi install npm:@tw93/waza
+```
+
 Pi can load Waza's standard `skills/<name>/SKILL.md` layout from the repo or from the published `@tw93/waza` npm package, which exposes `pi.skills` metadata pointing at `./skills`. `/health` audits Pi settings, configured packages, and local skill roots alongside Claude Code and Codex.
 
 **Update**
@@ -86,6 +90,7 @@ npx skills update -g -y
 ```
 
 Marketplace installs use `claude plugin update <skill>`. Claude Desktop users can replace the old skill with the latest [waza.zip](https://github.com/tw93/Waza/releases/latest/download/waza.zip).
+Pi users can run `pi update npm:@tw93/waza`, or `pi update --extensions` to update all installed Pi packages.
 
 ## Project Context
 

@@ -34,6 +34,7 @@ from skill_checks import (  # noqa: E402
     check_outcome_contract,
     check_portable_skill_surface,
     check_readme_install_command,
+    check_release_workflow_npm_surface,
     check_references,
     check_resolver,
     check_rules_files_present,
@@ -101,6 +102,7 @@ def main() -> int:
     check_waza_routing_skills(root, skill_names)
     check_waza_routing_triggers(root)
     check_readme_install_command(root)
+    check_release_workflow_npm_surface(root)
     check_english_coaching_guard(root)
     check_attribution_leak(root)
     return 0

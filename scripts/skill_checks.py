@@ -638,7 +638,39 @@ def check_readme_install_command(root: Path):
             f"README INSTALL COMMAND: README.md must include {expected!r}\n"
             f"  Waza's public install path depends on this exact string."
         )
-    print("ok: README installs nested skills")
+    expected_pi = "pi install npm:@tw93/waza"
+    if expected_pi not in text:
+        fail(
+            f"README PI INSTALL COMMAND: README.md must include {expected_pi!r}\n"
+            f"  The Pi package install path depends on this exact string."
+        )
+    print("ok: README installs nested skills and Pi package")
+
+
+def check_release_workflow_npm_surface(root: Path):
+    """GitHub releases must publish the npm package that Pi consumes."""
+    workflow = root / ".github" / "workflows" / "release.yml"
+    if not workflow.exists():
+        fail(f"MISSING RELEASE WORKFLOW: expected {workflow}")
+    text = workflow.read_text()
+    required = {
+        "npm publish": "publishes @tw93/waza during release",
+        "npm view @tw93/waza": "re-reads the npm registry after publish",
+        "id-token: write": "allows npm trusted publishing through GitHub OIDC",
+        "node-version: 24": "uses a Node/npm runtime that supports trusted publishing",
+        "package-manager-cache: false": "keeps release publish jobs from caching credentials or package state",
+        "github.event.release.tag_name": "checks the GitHub release tag",
+        "package.json').pi.skills[0]": "checks Pi package metadata",
+        "dist-tags.latest": "confirms the npm latest dist-tag",
+    }
+    missing = [label for label, reason in required.items() if label not in text]
+    if missing:
+        fail(
+            "RELEASE WORKFLOW NPM SURFACE: .github/workflows/release.yml "
+            "must publish and verify @tw93/waza for Pi installs.\n"
+            + "\n".join(f"  missing {label!r}: {required[label]}" for label in missing)
+        )
+    print("ok: release workflow publishes and verifies npm package")
 
 
 def check_english_coaching_guard(root: Path):
