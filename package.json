@@ -31,7 +31,8 @@
   },
   "pi": {
     "skills": [
-      "./skills"
+      "./skills",
+      "!skills/RESOLVER.md"
     ]
   }
 }

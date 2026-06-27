@@ -11,6 +11,8 @@ version=$(cat "$tmpdir/repo/VERSION")
 test "$(jq -r '.name' "$tmpdir/repo/package.json")" = "@tw93/waza"
 test "$(jq -r '.version' "$tmpdir/repo/package.json")" = "$version"
 test "$(jq -r '.pi.skills[0]' "$tmpdir/repo/package.json")" = "./skills"
+# Pi scans root-level *.md as skills; the routing index must be excluded.
+test "$(jq -r '.pi.skills | index("!skills/RESOLVER.md")' "$tmpdir/repo/package.json")" != "null"
 test "$(jq -r '.keywords[]' "$tmpdir/repo/package.json" | grep -c '^pi-package$')" -eq 1
 test "$(jq -r '.keywords[]' "$tmpdir/repo/package.json" | grep -c '^antigravity$')" -eq 1
 test "$(jq -r '.keywords[]' "$tmpdir/repo/package.json" | grep -c '^opencode$')" -eq 1

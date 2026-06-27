@@ -262,8 +262,12 @@ def build_package_json(version: str) -> str:
             "access": "public",
         },
         "pi": {
+            # Pi scans a skills directory for both recursive SKILL.md and
+            # stray root-level *.md, so exclude the human routing index;
+            # it has no frontmatter description and is not a skill.
             "skills": [
                 "./skills",
+                "!skills/RESOLVER.md",
             ],
         },
     }
